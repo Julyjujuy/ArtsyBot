@@ -29,11 +29,11 @@ namespace ArtsyBot
             HtmlNode urlElement = htmlDoc.DocumentNode.SelectSingleNode("//a[@href='/z']");
 
             // Extract the values of the elements as strings
-            string imageUrl = imageElement?.GetAttributeValue("image", "").Trim();
+            string imageUrl = imageElement?.GetAttributeValue("src", "").Trim();
             string yValue = DescriptionElement?.GetAttributeValue("description", "").Trim();
-            string zValue = urlElement?.GetAttributeValue("link", "").Trim();
+            string zValue = urlElement?.GetAttributeValue("href", "").Trim();
 
-            // Do something with the scraped data (store in sql)
+            // Do something with the scraped data 
             Console.WriteLine($"URL of image: {imageUrl}");
             Console.WriteLine($"Value of Y: {yValue}");
             Console.WriteLine($"Value of Z: {zValue}");
