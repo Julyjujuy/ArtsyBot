@@ -24,7 +24,6 @@ namespace ArtsyBot
                 LogicMethods.ScrapeWebsite(url);
             }
 
-
             // Scrape the first page
             LogicMethods.ScrapeWebsite(baseUrl);
 
