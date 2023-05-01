@@ -12,37 +12,19 @@ namespace ArtsyBot
             HtmlWeb web = new HtmlWeb();
             return web.Load(url);
         }
-
-        // Find the total number of pages on the website
         public static int GetTotalPages(HtmlDocument htmlDoc)
         {
-            int totalPages = 0;
-            HtmlNode pageNode = htmlDoc.DocumentNode.SelectSingleNode("//a[@title='Last Page']");
-            if (pageNode != null)
-            {
-                string hrefValue = pageNode.GetAttributeValue("href", "");
-                if (!string.IsNullOrEmpty(hrefValue))
-                {
-                    int startIndex = hrefValue.LastIndexOf("page=") + "page=".Length;
-                    int endIndex = hrefValue.LastIndexOf("&", StringComparison.InvariantCulture);
-                    if (startIndex >= 0 && endIndex >= 0 && endIndex > startIndex)
-                    {
-                        int.TryParse(hrefValue.Substring(startIndex, endIndex - startIndex), out totalPages);
-                    }
-                }
-            }
-
-            return totalPages;
+            return htmlDoc.DocumentNode.SelectNodes("//a[starts-with(@href, 'http')]").Count;
         }
         public static void ScrapeWebsite(string url)
         {
             // Load the website's HTML document
             HtmlDocument htmlDoc = GetHtmlDocument(url);
 
-            var imageContainers = htmlDoc.DocumentNode.SelectNodes("//div[contains(@class, 'ImageWithHover')]");
-            if (imageContainers != null)
+            var articleContainers = htmlDoc.DocumentNode.SelectNodes("//article[contains(@class, 'CategorySearchCard__StyledCard-sc-1o7izf2-0')]");
+            if (articleContainers != null)
             {
-                foreach (var container in imageContainers)
+                foreach (var container in articleContainers)
                 {
                     // Get the image URL
                     var imageUrl = container.SelectSingleNode(".//img")?.GetAttributeValue("src", "");
@@ -51,7 +33,9 @@ namespace ArtsyBot
                     var description = container.SelectSingleNode(".//img")?.GetAttributeValue("alt", "");
 
                     // Get the page URL
-                    var pageUrl = container.ParentNode.GetAttributeValue("href", "");
+                    var pageUrl = container.SelectSingleNode(".//a[@class='sc-hsiEis cgsAkx ImageRow__ContainerLink-sc-1s4yel2-0 dlJysj CategorySearchCard__PlacedItemCardImage-sc-1o7izf2-3 iSZMAW']")?.GetAttributeValue("href", "");
+
+                    //var pageUrl = container.SelectSingleNode(".//a[@class='h4 item-title']")?.GetAttributeValue("href", "");
 
                     // Output the results
                     Console.WriteLine($"Image URL: {imageUrl}");
@@ -62,9 +46,8 @@ namespace ArtsyBot
             }
             else
             {
-                Console.WriteLine("No image containers found.");
+                Console.WriteLine("No article containers found.");
             }
-
         }
 
     }
