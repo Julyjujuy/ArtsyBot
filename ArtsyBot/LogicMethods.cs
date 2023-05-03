@@ -24,6 +24,7 @@ namespace ArtsyBot
             var articleContainers = htmlDoc.DocumentNode.SelectNodes("//article[contains(@class, 'CategorySearchCard__StyledCard-sc-1o7izf2-0')]");
             if (articleContainers != null)
             {
+                int counter = 0; // Initialize the counter variable
                 foreach (var container in articleContainers)
                 {
                     // Get the image URL
@@ -35,7 +36,11 @@ namespace ArtsyBot
                     // Get the page URL
                     var pageUrl = container.SelectSingleNode(".//a[@class='sc-hsiEis cgsAkx ImageRow__ContainerLink-sc-1s4yel2-0 dlJysj CategorySearchCard__PlacedItemCardImage-sc-1o7izf2-3 iSZMAW']")?.GetAttributeValue("href", "");
 
-                    //var pageUrl = container.SelectSingleNode(".//a[@class='h4 item-title']")?.GetAttributeValue("href", "");
+                    // Concatenate the prefix to the page URL
+                    pageUrl = "https://www.liveauctioneers.com" + pageUrl;
+
+                    // Increment the counter
+                    counter++;
 
                     // Output the results
                     Console.WriteLine($"Image URL: {imageUrl}");
@@ -43,12 +48,16 @@ namespace ArtsyBot
                     Console.WriteLine($"Page URL: {pageUrl}");
                     Console.WriteLine();
                 }
+
+                // Output the total number of elements scraped
+                Console.WriteLine($"Scraped {counter} elements.");
             }
             else
             {
                 Console.WriteLine("No article containers found.");
             }
         }
+
 
     }
 }
