@@ -5,34 +5,28 @@ namespace ArtsyBot
 {
     internal class Program
     {
-
         public static void Main()
         {
             string baseUrl = "https://www.liveauctioneers.com/c/clocks/74/";
 
-            // Load the first page of the website
-            HtmlDocument htmlDoc = LogicMethods.GetHtmlDocument(baseUrl);
-
-            // Find the total number of pages on the website
-            int totalPages = LogicMethods.GetTotalPages(htmlDoc);
-            Console.WriteLine(totalPages.ToString());
-
-            // Scrape data from all pages of the website
-            for (int page = 1; page <= totalPages; page++)
+            // Loop from 2 to 100, constructing and scraping each page
+            for (int i = 2; i <= 100; i++)
             {
-                string url = $"{baseUrl}?page={page}";
-                LogicMethods.ScrapeWebsite(url);
+                // Construct the new URL for this page
+                string restBaseUrl = $"{baseUrl}?page={i}";
+
+                // Scrape data from this page
+                LogicMethods.ScrapeWebsite(restBaseUrl);
+
+                // Pause for a moment 
+                System.Threading.Thread.Sleep(1000);
             }
 
-            // Scrape the first page
+            // Scrape data from the first page
             LogicMethods.ScrapeWebsite(baseUrl);
 
-            // Scrape the remaining pages
-            for (int page = 2; page <= totalPages; page++)
-            {
-                string pageUrl = $"{baseUrl}?page={page}";
-                LogicMethods.ScrapeWebsite(pageUrl);
-            }
+            Console.WriteLine("Done scraping!");
+            Console.ReadLine();
         }
     }
 }
