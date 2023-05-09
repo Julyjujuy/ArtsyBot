@@ -6,32 +6,25 @@ namespace ArtsyBot
 {
     public class LogicMethods
     {
-        //takes the url and transform the page into a HtmlDocument
-        public static HtmlDocument GetHtmlDocument(string url)
-        {
-            HtmlWeb web = new HtmlWeb();
-            return web.Load(url);
-        }
-        public static int GetTotalPages(HtmlDocument htmlDoc)
-        {
-            return htmlDoc.DocumentNode.SelectNodes("//a[starts-with(@href, 'http')]").Count;
-        }
         public static void ScrapeWebsite(string url)
         {
             // Load the website's HTML document
-            HtmlDocument htmlDoc = GetHtmlDocument(url);
+            HtmlWeb web = new HtmlWeb();
+            HtmlDocument htmlDoc = web.Load(url);
 
-            var articleContainers = htmlDoc.DocumentNode.SelectNodes("//article[contains(@class, 'CategorySearchCard__StyledCard-sc-1o7izf2-0')]");
+            // Find all the article containers on the page
+            var articleContainers = htmlDoc.DocumentNode.SelectNodes("//article[contains(@class, 'CategorySearchCard__StyledCard-sc-1o7izf2-0')]"
+);
             if (articleContainers != null)
             {
                 int counter = 0; // Initialize the counter variable
                 foreach (var container in articleContainers)
                 {
                     // Get the image URL
-                    var imageUrl = container.SelectSingleNode(".//img")?.GetAttributeValue("src", "");
+                    var imageUrl = container.SelectSingleNode(".//img[1]")?.GetAttributeValue("src", "");
 
                     // Get the description
-                    var description = container.SelectSingleNode(".//img")?.GetAttributeValue("alt", "");
+                    var description = container.SelectSingleNode(".//img[1]")?.GetAttributeValue("alt", "");
 
                     // Get the page URL
                     var pageUrl = container.SelectSingleNode(".//a[@class='sc-hsiEis cgsAkx ImageRow__ContainerLink-sc-1s4yel2-0 dlJysj CategorySearchCard__PlacedItemCardImage-sc-1o7izf2-3 iSZMAW']")?.GetAttributeValue("href", "");
@@ -57,8 +50,6 @@ namespace ArtsyBot
                 Console.WriteLine("No article containers found.");
             }
         }
-
-
     }
 }
 
