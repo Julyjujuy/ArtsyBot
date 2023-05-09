@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using System;
+using System.Threading;
 
 namespace ArtsyBot
 {
@@ -19,7 +20,7 @@ namespace ArtsyBot
                 LogicMethods.ScrapeWebsite(restBaseUrl);
 
                 // Pause for a moment 
-                System.Threading.Thread.Sleep(1000);
+                Thread.Sleep(1000);
             }
 
             // Scrape data from the first page
