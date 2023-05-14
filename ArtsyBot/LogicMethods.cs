@@ -1,6 +1,5 @@
 ﻿using HtmlAgilityPack;
-
-
+using System.Net;
 
 namespace ArtsyBot
 {
@@ -11,6 +10,21 @@ namespace ArtsyBot
             // Load the website's HTML document
             HtmlWeb web = new HtmlWeb();
             HtmlDocument htmlDoc = web.Load(url);
+            var lastStatusCode = HttpStatusCode.OK;
+
+            web.PostResponse = (request, response) =>
+            {
+                if (response != null)
+                {
+                    lastStatusCode = response.StatusCode;
+                }
+            };
+
+            //example!!! not real code dont use it
+           // if(lastStatusCode != HttpStatusCode.OK)
+            //{
+             //   return null;
+            //}
 
             // Find all the article containers on the page
             var articleContainers = htmlDoc.DocumentNode.SelectNodes("//article[contains(@class, 'CategorySearchCard__StyledCard-sc-1o7izf2-0')]"

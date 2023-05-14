@@ -19,13 +19,8 @@ namespace ArtsyBot
                 // Scrape data from this page
                 LogicMethods.ScrapeWebsite(restBaseUrl);
 
-                // Pause for a moment
-                Thread.Sleep(1000);
-                // Pause for a moment 
-                Thread.Sleep(1000);
-            {
-                string url = $"{baseUrl}?page={page}";
-                LogicMethods.ScrapeWebsite(url);
+                // Call the Thread.Sleep() function with a random time between 1000 and 5000 (milliseconds)
+                Thread.Sleep(new Random().Next(1000, 5000));
             }
 
             // Scrape data from the first page
