@@ -19,7 +19,7 @@ namespace ArtsyBot
                 // Scrape data from this page
                 LogicMethods.ScrapeWebsite(restBaseUrl);
 
-                // Call the Thread.Sleep() function with a random time between 1000 and 5000 (milliseconds)
+                // Pause function with a random time between 1000 and 5000
                 Thread.Sleep(new Random().Next(1000, 5000));
             }
 
