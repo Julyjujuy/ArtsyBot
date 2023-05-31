@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using System;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 
 namespace ArtsyBot
@@ -17,7 +18,12 @@ namespace ArtsyBot
                 string restBaseUrl = $"{baseUrl}?page={i}";
 
                 // Scrape data from this page
-                LogicMethods.ScrapeWebsite(restBaseUrl);
+                bool sucess = LogicMethods.ScrapeWebsite(restBaseUrl);
+
+                if (!sucess) 
+                {
+                    Console.WriteLine("Faild at Reuest no:" + i); 
+                }
 
                 // Pause function with a random time between 1000 and 5000
                 Thread.Sleep(new Random().Next(1000, 5000));
@@ -27,6 +33,7 @@ namespace ArtsyBot
             LogicMethods.ScrapeWebsite(baseUrl);
 
             Console.WriteLine("Done scraping!");
+
             Console.ReadLine();
         }
     }

@@ -1,5 +1,6 @@
 ﻿namespace ArtsyBot
 {
+    [Serializable]
     internal class AuctionItem
     {
         public string ImageUrl { get; set; }
