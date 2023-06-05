@@ -7,15 +7,17 @@ using System.Globalization;
 using System.IO;
 using System.Xml;
 using System.Threading;
+using System.Xml.Serialization;
 
 
 namespace ArtsyBot
 {
     public class LogicMethods
     {
-      
         public static bool ScrapeWebsite(string url)
         {
+            const string filePath = @"C:\Temp\auction_items.xml";
+
             // Load the website's HTML document
             HtmlWeb web = new HtmlWeb();
             HtmlDocument htmlDoc = web.Load(url);
@@ -112,62 +114,33 @@ namespace ArtsyBot
                 Console.WriteLine("No article containers found.");
             }
             // Convert the scraped items to XML
-            string xml = ConvertToXml(auctionItems);
+            string xml = Serialize(auctionItems, filePath);
 
             // Save the XML to a file
-            string filePath = @"C:\Temp\auction_items.xml";
-            SaveXmlToFile(xml, filePath);
+            Deserialize(filePath);
 
             return true;
         }
 
 
 
-        private static string ConvertToXml(List<AuctionItem> auctionItems)
+        public static Serialize(List<AuctionItem> auctionItems, string path)
         {
-            XmlDocument xmlDoc = new XmlDocument();
-
-            // create the root element
-            XmlElement rootElement = xmlDoc.CreateElement("AuctionItems");
-            xmlDoc.AppendChild(rootElement);
-
-            // create child elements for each item
-            foreach (var item in auctionItems)
+            XmlSerializer serializer = new XmlSerializer(typeof(List<AuctionItem>));
+            using (FileStream file = File.Create(path))
             {
-                XmlElement itemElement = xmlDoc.CreateElement("AuctionItem");
-
-                XmlElement imageUrlElement = xmlDoc.CreateElement("ImageUrl");
-                imageUrlElement.InnerText = item.ImageUrl;
-                itemElement.AppendChild(imageUrlElement);
-
-                XmlElement descriptionElement = xmlDoc.CreateElement("Description");
-                descriptionElement.InnerText = item.Description;
-                itemElement.AppendChild(descriptionElement);
-
-                XmlElement pageUrlElement = xmlDoc.CreateElement("PageUrl");
-                pageUrlElement.InnerText = item.PageUrl;
-                itemElement.AppendChild(pageUrlElement);
-
-                XmlElement estimatedPriceElement = xmlDoc.CreateElement("EstimatedPrice");
-                estimatedPriceElement.InnerText = item.EstimatedPrice;
-                itemElement.AppendChild(estimatedPriceElement);
-
-                XmlElement spanTextElement = xmlDoc.CreateElement("LongDescription");
-                spanTextElement.InnerText = item.LongDescription;
-                itemElement.AppendChild(spanTextElement);
-
-                rootElement.AppendChild(itemElement);
+                serializer.Serialize(file, auctionItems);
             }
-
-            return xmlDoc.OuterXml;
         }
-        private static void SaveXmlToFile(string xml, string filePath)
+        public static List<AuctionItem> Deserialize(string path)
         {
-            // Save the XML 
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(xml);
-            xmlDoc.Save(filePath);
+            XmlSerializer serializer = new XmlSerializer(typeof(List<AuctionItem>));
+            using (FileStream file = File.OpenRead(path))
+            {
+                return (List<AuctionItem>)serializer.Deserialize(file);
+            }
         }
+
 
     }
 }
