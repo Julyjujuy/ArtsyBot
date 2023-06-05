@@ -114,7 +114,7 @@ namespace ArtsyBot
                 Console.WriteLine("No article containers found.");
             }
             // Convert the scraped items to XML
-            string xml = Serialize(auctionItems, filePath);
+            Serialize(auctionItems, filePath);
 
             // Save the XML to a file
             Deserialize(filePath);
@@ -124,7 +124,7 @@ namespace ArtsyBot
 
 
 
-        public static Serialize(List<AuctionItem> auctionItems, string path)
+        public static void Serialize(List<AuctionItem> auctionItems, string path)
         {
             XmlSerializer serializer = new XmlSerializer(typeof(List<AuctionItem>));
             using (FileStream file = File.Create(path))
