@@ -1,20 +1,15 @@
 ﻿using System;
 using HtmlAgilityPack;
 using System.Net;
-using CsvHelper;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Xml;
-using System.Threading;
 using System.Xml.Serialization;
+using System.Text;
 
 
 namespace ArtsyBot
 {
     public class LogicMethods
     {
-        public static bool ScrapeWebsite(string url)
+        public static bool ScrapeWebsite(string url, List<AuctionItem> items)
         {
             const string filePath = @"C:\Temp\auction_items.xml";
 
@@ -36,6 +31,7 @@ namespace ArtsyBot
                 ;
                 return false;
                 // Reason: the page request failed
+                //TODO log whatever you can :D 
 
             }
 
@@ -49,7 +45,9 @@ namespace ArtsyBot
                 int counter = 0; // Initialize the counter variable
                 foreach (var container in articleContainers)
                 {
-                    Thread.Sleep(60*1000);
+                    //TODO: if fail happens in this loop, log everything you can ;) and return false;
+
+                    Thread.Sleep(30*1000);
                     // Get the image URL from main Page
                     var imageUrl = container.SelectSingleNode(".//img[1]")?.GetAttributeValue("src", "");
 
@@ -122,7 +120,62 @@ namespace ArtsyBot
             return true;
         }
 
+        public static class Logger
+        {
+            private static string logFilePath = "log.txt";
+            private static string reportFilePath = "report.txt";
 
+            public static void Log(string message)
+            {
+                string logEntry = $"[{DateTime.Now}] {message}";
+
+                // Append the log entry to the log file
+                File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
+
+                // Print the log entry to the console
+                Console.WriteLine(logEntry);
+            }
+
+            public static void GenerateReport(List<AuctionItem> auctionItems, int successfulExtractions, int failedExtractions)
+            {
+                // Generate a report summary
+                StringBuilder reportSummary = new StringBuilder();
+                reportSummary.AppendLine("Scraping Report");
+                reportSummary.AppendLine($"Total Items: {auctionItems.Count}");
+                reportSummary.AppendLine($"Successful Extractions: {successfulExtractions}");
+                reportSummary.AppendLine($"Failed Extractions: {failedExtractions}");
+
+                // Generate a report details for each auction item
+                StringBuilder reportDetails = new StringBuilder();
+                reportDetails.AppendLine("Scraped Items:");
+                foreach (var item in auctionItems)
+                {
+                    reportDetails.AppendLine($"- {item.Description}");
+                    reportDetails.AppendLine($"  Image URL: {item.ImageUrl}");
+                    reportDetails.AppendLine($"  Page URL: {item.PageUrl}");
+                    reportDetails.AppendLine($"  Estimated Price: {item.EstimatedPrice}");
+                    reportDetails.AppendLine($"  Description Section: {item.LongDescription}");
+                    reportDetails.AppendLine();
+                }
+
+                // Generate the final report
+                StringBuilder report = new StringBuilder();
+                report.Append(reportSummary);
+                report.AppendLine();
+                report.Append(reportDetails);
+
+                // Save the report to the report file
+                File.WriteAllText(reportFilePath, report.ToString());
+
+                // Print the report to the console
+                Console.WriteLine(report);
+            }
+        }
+        public static void SaveReportToFile(string report, string filePath)
+        {
+            File.WriteAllText(filePath, report);
+            Console.WriteLine($"Report saved to {filePath}");
+        }
 
         public static void Serialize(List<AuctionItem> auctionItems, string path)
         {
