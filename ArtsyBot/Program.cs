@@ -22,7 +22,7 @@ namespace ArtsyBot
                 string restBaseUrl = $"{baseUrl}?page={i}";
 
                 // Scrape data from this page
-                bool success = LogicMethods.ScrapeWebsite(restBaseUrl, auctionItems);
+                bool success = LogicMethods.ScrapeWebsite(restBaseUrl, auctionItems,20);
 
                 if (success)
                 {
@@ -40,7 +40,7 @@ namespace ArtsyBot
             }
 
             // Scrape data from the first page
-            bool firstPageSuccess = LogicMethods.ScrapeWebsite(baseUrl, auctionItems);
+            bool firstPageSuccess = LogicMethods.ScrapeWebsite(baseUrl, auctionItems,20);
 
             if (firstPageSuccess)
             {

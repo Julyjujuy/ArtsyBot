@@ -1,4 +1,6 @@
-﻿namespace ArtsyBot
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ArtsyBot
 {
     [Serializable]
     public class AuctionItem
@@ -8,10 +10,13 @@
         public string PageUrl { get; set; }
         public string EstimatedPrice { get; set; }
         public string LongDescription { get; set; }
-        //TODO: get ALL THE THINGS
+        public string AuctioneerName { get; set; }
 
-        //f.e. when it was scraped timestamp
+        public string AuctionTimeLeft { get; set; }
 
-        //f.e. scrape source
+        public string StartingPrice { get; set; }
+
+        //timestamp
+        //
     }
 }

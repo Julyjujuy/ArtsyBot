@@ -9,7 +9,7 @@ namespace ArtsyBot
 {
     public class LogicMethods
     {
-        public static bool ScrapeWebsite(string url, List<AuctionItem> items)
+        public static bool ScrapeWebsite(string url, List<AuctionItem> items, int delaySeconds)
         {
             const string filePath = @"C:\Temp\auction_items.xml";
 
@@ -45,9 +45,8 @@ namespace ArtsyBot
                 int counter = 0; // Initialize the counter variable
                 foreach (var container in articleContainers)
                 {
-                    //TODO: if fail happens in this loop, log everything you can ;) and return false;
 
-                    Thread.Sleep(30*1000);
+                    Thread.Sleep(delaySeconds * 1000);
                     // Get the image URL from main Page
                     var imageUrl = container.SelectSingleNode(".//img[1]")?.GetAttributeValue("src", "");
 
@@ -74,9 +73,18 @@ namespace ArtsyBot
                     var spanElement = innerHtmlDoc.DocumentNode.SelectSingleNode("//span[@data-testid='body-primary' and contains(@class, 'sc-vjKnw kanvka DescriptionSection__StyledBody-sc-trkwix-2 gtFpYt')]");
                     string spanText = spanElement?.InnerText ?? string.Empty;
 
-                    // Extract the image URL from AuctioneerInfo
-                    var auctioneerImageNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//img[contains(@class, 'AuctioneerInfo__StyledImageWithFallback-sc-1erc2m8-2 eoKPJL no-js-jasper52_large')]");
-                    var auctioneerImageUrl = auctioneerImageNode?.GetAttributeValue("src", "");
+                    // Extract the name from AuctioneerInfo
+
+                    var auctioneerNameNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//span[contains(@class, 'sc-hLseeU AuctioneerInfo__SellerNameText-sc-1erc2m8-5 jnbWxy chuhQu')]");
+                    var auctioneerName = auctioneerNameNode?.InnerText;
+
+                    // Extract the time left before auction
+                    var auctionTimeLeftNode = htmlDoc.DocumentNode.SelectSingleNode("//span[@class='sc-fsQiph CatalogDate__CountdownSpan-sc-132deab-0 tJwNN eXkwFh']");
+                    var auctionTimeLeft = auctionTimeLeftNode?.InnerText;
+
+                    // Extract the starting price
+                    var priceNode = htmlDoc.DocumentNode.SelectSingleNode("//span[@class='FormattedCurrency__StyledFormattedCurrency-sc-1ugrxi1-0 kRoxAz']");
+                    var startingPrice = priceNode?.InnerText;
 
                     // Increment the counter
                     counter++;
@@ -88,7 +96,10 @@ namespace ArtsyBot
                         Description = description,
                         PageUrl = pageUrl,
                         EstimatedPrice = estimatedPrice,
-                        LongDescription = spanText
+                        LongDescription = spanText,
+                        AuctioneerName = auctioneerName,
+                        AuctionTimeLeft = auctionTimeLeft,
+                        StartingPrice = startingPrice,
                     };
                     // Add the item to the list
                     auctionItems.Add(item);
@@ -100,7 +111,9 @@ namespace ArtsyBot
                     Console.WriteLine($"Page URL: {pageUrl}");
                     Console.WriteLine($"Estimate: {estimatedPrice}");
                     Console.WriteLine($"Description Section: {spanText}");
-                    Console.WriteLine($"AuctioneerImageUrl: {auctioneerImageUrl}");
+                    Console.WriteLine($"AuctioneerName: {auctioneerName}");
+                    Console.WriteLine($"Time left before Auction: {auctionTimeLeft}");
+                    Console.WriteLine($"Starting Price: {startingPrice}");
                     Console.WriteLine();
                 }
 
@@ -155,6 +168,7 @@ namespace ArtsyBot
                     reportDetails.AppendLine($"  Page URL: {item.PageUrl}");
                     reportDetails.AppendLine($"  Estimated Price: {item.EstimatedPrice}");
                     reportDetails.AppendLine($"  Description Section: {item.LongDescription}");
+                    reportDetails.AppendLine($"  Description Section: {item.AuctioneerName}");
                     reportDetails.AppendLine();
                 }
 
