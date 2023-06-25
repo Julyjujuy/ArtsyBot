@@ -75,7 +75,7 @@ namespace ArtsyBot
 
                     // Extract the name from AuctioneerInfo
 
-                    var auctioneerNameNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//span[contains(@class, 'sc-hLseeU AuctioneerInfo__SellerNameText-sc-1erc2m8-5 jnbWxy chuhQu')]");
+                    var auctioneerNameNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//span[@data-testid='itemPageSellerName' and @class='sc-hLseeU AuctioneerInfo__SellerNameText-sc-1erc2m8-5 jnbWxy chuhQu']");
                     var auctioneerName = auctioneerNameNode?.InnerText;
 
                     // Extract the time left before auction
