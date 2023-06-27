@@ -65,9 +65,34 @@ namespace ArtsyBot
 
                     //todo: check if HtmlWeb saves coockies => it doesnt. Tried to save cookies in a cookie container and it was always empty
            
-                    // Extract the Estimate text
+                    // Extract the Estimate text a second time in case it is encased
                     var estimateNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//div[@class='ItemBiddingEstimate__StyledEstimateAmounts-sc-e0x4f0-4 eRGEFe']");
                     var estimatedPrice = estimateNode?.InnerText;
+
+                    string concatenatedText = null;
+
+                    var estimateNode2 = innerHtmlDoc.DocumentNode.SelectSingleNode("//div[@class='ItemBiddingEstimate__StyledEstimateAmounts-sc-e0x4f0-4 eRGEFe']");
+                    if (estimateNode2 != null)
+                    {
+                        var estimateText = estimateNode2.InnerText.Trim();
+                        var spanNodes = estimateNode2.SelectNodes(".//span[@class='FormattedCurrency__StyledFormattedCurrency-sc-1ugrxi1-0 kRoxAz']");
+                        if (spanNodes != null)
+                        {
+                            var sb = new StringBuilder();
+                            sb.Append(estimateText);
+
+                            foreach (var spanNode in spanNodes)
+                            {
+                                sb.Append(" ");
+                                sb.Append(spanNode.InnerText.Trim());
+                            }
+
+                            concatenatedText = sb.ToString();
+                        }
+                    }
+
+                 
+
 
                     // Extract the description section
                     var spanElement = innerHtmlDoc.DocumentNode.SelectSingleNode("//span[@data-testid='body-primary' and contains(@class, 'sc-vjKnw kanvka DescriptionSection__StyledBody-sc-trkwix-2 gtFpYt')]");
@@ -100,6 +125,7 @@ namespace ArtsyBot
                         AuctioneerName = auctioneerName,
                         AuctionTimeLeft = auctionTimeLeft,
                         StartingPrice = startingPrice,
+                        EstimatedPriceFailSafe = concatenatedText,
                     };
                     // Add the item to the list
                     auctionItems.Add(item);
@@ -110,6 +136,7 @@ namespace ArtsyBot
                     Console.WriteLine($"Description: {description}");
                     Console.WriteLine($"Page URL: {pageUrl}");
                     Console.WriteLine($"Estimate: {estimatedPrice}");
+                    Console.WriteLine($"FailSafeEstimate: {concatenatedText}");
                     Console.WriteLine($"Description Section: {spanText}");
                     Console.WriteLine($"AuctioneerName: {auctioneerName}");
                     Console.WriteLine($"Time left before Auction: {auctionTimeLeft}");
