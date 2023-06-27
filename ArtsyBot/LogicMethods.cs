@@ -103,13 +103,38 @@ namespace ArtsyBot
                     var auctioneerNameNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//span[@data-testid='itemPageSellerName' and @class='sc-hLseeU AuctioneerInfo__SellerNameText-sc-1erc2m8-5 jnbWxy chuhQu']");
                     var auctioneerName = auctioneerNameNode?.InnerText;
 
-                    // Extract the time left before auction
-                    var auctionTimeLeftNode = htmlDoc.DocumentNode.SelectSingleNode("//span[@class='sc-fsQiph CatalogDate__CountdownSpan-sc-132deab-0 tJwNN eXkwFh']");
-                    var auctionTimeLeft = auctionTimeLeftNode?.InnerText;
+
+
+                    //string startingPrice = null;
+                    //string auctionTimeLeft = null;
+
+                    //// Select all the containers
+                    //var containerNodes = htmlDoc.DocumentNode.SelectNodes("//div[@class='sc-fsQiph CatalogDate__CountdownSpan-sc-132deab-0 tJwNN eXkwFh']");
+
+                    //if (containerNodes != null)
+                    //{
+                    //    foreach (var containerNode in containerNodes)
+                    //    {
+                    //        var auctionTimeLeftNode = containerNode.SelectSingleNode(".//span[@class='sc-fsQiph CatalogDate__CountdownSpan-sc-132deab-0 tJwNN eXkwFh']");
+                    //        auctionTimeLeft = auctionTimeLeftNode?.InnerText;
+
+                    //        var priceNode = containerNode.SelectSingleNode(".//span[@class='FormattedCurrency__StyledFormattedCurrency-sc-1ugrxi1-0 kRoxAz']");
+                    //        startingPrice = priceNode?.InnerText;
+
+
+                    var dateNode = htmlDoc.DocumentNode.SelectSingleNode("//span[@class='sc-fsQiph CatalogDate__CountdownSpan-sc-132deab-0 tJwNN eXkwFh']");
+                    string auctionTimeLeft = dateNode?.InnerText;
+
+
+                    //// Extract the time left before auction
+                    //var auctionTimeLeftNode = htmlDoc.DocumentNode.SelectSingleNode("//span[@class='sc-fsQiph CatalogDate__CountdownSpan-sc-132deab-0 tJwNN eXkwFh']");
+                    //var auctionTimeLeft = auctionTimeLeftNode?.InnerText;
 
                     // Extract the starting price
                     var priceNode = htmlDoc.DocumentNode.SelectSingleNode("//span[@class='FormattedCurrency__StyledFormattedCurrency-sc-1ugrxi1-0 kRoxAz']");
                     var startingPrice = priceNode?.InnerText;
+                    //    }
+                    //}
 
                     // Increment the counter
                     counter++;
