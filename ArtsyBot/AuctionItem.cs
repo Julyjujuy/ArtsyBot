@@ -15,7 +15,7 @@ namespace ArtsyBot
         public string AuctionTimeLeft { get; set; }
 
         public string StartingPrice { get; set; }
-        public string EstimatedPriceFailSafe { get; set; }
+
 
         //timestamp
         //

@@ -15,14 +15,14 @@ namespace ArtsyBot
             int successfulExtractions = 0;
             int failedExtractions = 0;
 
-            // Loop from 2 to 100, constructing and scraping each page
-            for (int i = 2; i <= 100; i++)
+            // Loop from 1 to 100, constructing and scraping each page
+            for (int i = 1; i <= 100; i++)
             {
                 // Construct the new URL for this page
                 string restBaseUrl = $"{baseUrl}?page={i}";
 
                 // Scrape data from this page
-                bool success = LogicMethods.ScrapeWebsite(restBaseUrl, auctionItems,20);
+                bool success = LogicMethods.ScrapeWebsite(restBaseUrl, auctionItems,10);
 
                 if (success)
                 {

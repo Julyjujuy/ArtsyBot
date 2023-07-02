@@ -65,33 +65,32 @@ namespace ArtsyBot
 
                     //todo: check if HtmlWeb saves coockies => it doesnt. Tried to save cookies in a cookie container and it was always empty
            
-                    // Extract the Estimate text a second time in case it is encased
+                    // Extract the Estimate text again in case it is encased
                     var estimateNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//div[@class='ItemBiddingEstimate__StyledEstimateAmounts-sc-e0x4f0-4 eRGEFe']");
-                    var estimatedPrice = estimateNode?.InnerText;
 
-                    string concatenatedText = null;
-
-                    var estimateNode2 = innerHtmlDoc.DocumentNode.SelectSingleNode("//div[@class='ItemBiddingEstimate__StyledEstimateAmounts-sc-e0x4f0-4 eRGEFe']");
-                    if (estimateNode2 != null)
+                    //check if load suceesful
+                    if(estimateNode == null)
                     {
-                        var estimateText = estimateNode2.InnerText.Trim();
-                        var spanNodes = estimateNode2.SelectNodes(".//span[@class='FormattedCurrency__StyledFormattedCurrency-sc-1ugrxi1-0 kRoxAz']");
-                        if (spanNodes != null)
-                        {
-                            var sb = new StringBuilder();
-                            sb.Append(estimateText);
+                        //load failed / limit hit
+                        Thread.Sleep(60 * 1000);
+                        innerHtmlDoc = web.Load(pageUrl);
+                        estimateNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//div[@class='ItemBiddingEstimate__StyledEstimateAmounts-sc-e0x4f0-4 eRGEFe']");
+                        if (estimateNode == null)
+                            ;//2 tries still boo 
 
-                            foreach (var spanNode in spanNodes)
-                            {
-                                sb.Append(" ");
-                                sb.Append(spanNode.InnerText.Trim());
-                            }
-
-                            concatenatedText = sb.ToString();
-                        }
                     }
 
-                 
+                    var estimatedPrice = estimateNode?.InnerText;
+
+
+                    //sometimes unhappy with estimatedPrice
+                    if(estimatedPrice == null || estimatedPrice.Contains("something"))
+                    {
+                        ;
+                    }
+
+
+
 
 
                     // Extract the description section
@@ -99,42 +98,25 @@ namespace ArtsyBot
                     string spanText = spanElement?.InnerText ?? string.Empty;
 
                     // Extract the name from AuctioneerInfo
-
                     var auctioneerNameNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//span[@data-testid='itemPageSellerName' and @class='sc-hLseeU AuctioneerInfo__SellerNameText-sc-1erc2m8-5 jnbWxy chuhQu']");
                     var auctioneerName = auctioneerNameNode?.InnerText;
 
+                    // Extract the time left before the Auction
+                    var dateNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//div[contains(@class, 'lt1g861EjAKl0fG1gZvV') and contains(@class, 'BiddingCountdown__StyledCountdown-sc-et36hu-0')]");
+                    var auctionTimeLeft = dateNode?.InnerText;
+
+                    //// Extract the starting price
+                    //var priceNode = htmlDoc.DocumentNode.SelectNodes("//span[contains(@class, 'FormattedCurrency__StyledFormattedCurrency-sc-1ugrxi1-0') and contains(@class, 'kRoxAz')]/ancestor::div[1]");
+                    //var startingPriceNode = priceNode.SelectSingleNode(".");
+                    //string startingPrice = startingPriceNode?.InnerText;
+
+                    var priceNode = htmlDoc.DocumentNode.SelectSingleNode(".//span[contains(@class, 'FormattedCurrency__StyledFormattedCurrency-sc-1ugrxi1-0') and contains(@class, 'kRoxAz')]");
+                    string startingPrice = priceNode?.InnerText ?? string.Empty;
+
+                    //var priceNode = htmlDoc.DocumentNode.SelectSingleNode("//span[contains(@class, 'FormattedCurrency__StyledFormattedCurrency-sc-1ugrxi1-0') and contains(@class, 'kRoxAz')]/ancestor::div[1]");
+                    //string startingPrice = priceNode?.InnerText;
 
 
-                    //string startingPrice = null;
-                    //string auctionTimeLeft = null;
-
-                    //// Select all the containers
-                    //var containerNodes = htmlDoc.DocumentNode.SelectNodes("//div[@class='sc-fsQiph CatalogDate__CountdownSpan-sc-132deab-0 tJwNN eXkwFh']");
-
-                    //if (containerNodes != null)
-                    //{
-                    //    foreach (var containerNode in containerNodes)
-                    //    {
-                    //        var auctionTimeLeftNode = containerNode.SelectSingleNode(".//span[@class='sc-fsQiph CatalogDate__CountdownSpan-sc-132deab-0 tJwNN eXkwFh']");
-                    //        auctionTimeLeft = auctionTimeLeftNode?.InnerText;
-
-                    //        var priceNode = containerNode.SelectSingleNode(".//span[@class='FormattedCurrency__StyledFormattedCurrency-sc-1ugrxi1-0 kRoxAz']");
-                    //        startingPrice = priceNode?.InnerText;
-
-
-                    var dateNode = htmlDoc.DocumentNode.SelectSingleNode("//span[@class='sc-fsQiph CatalogDate__CountdownSpan-sc-132deab-0 tJwNN eXkwFh']");
-                    string auctionTimeLeft = dateNode?.InnerText;
-
-
-                    //// Extract the time left before auction
-                    //var auctionTimeLeftNode = htmlDoc.DocumentNode.SelectSingleNode("//span[@class='sc-fsQiph CatalogDate__CountdownSpan-sc-132deab-0 tJwNN eXkwFh']");
-                    //var auctionTimeLeft = auctionTimeLeftNode?.InnerText;
-
-                    // Extract the starting price
-                    var priceNode = htmlDoc.DocumentNode.SelectSingleNode("//span[@class='FormattedCurrency__StyledFormattedCurrency-sc-1ugrxi1-0 kRoxAz']");
-                    var startingPrice = priceNode?.InnerText;
-                    //    }
-                    //}
 
                     // Increment the counter
                     counter++;
@@ -150,7 +132,7 @@ namespace ArtsyBot
                         AuctioneerName = auctioneerName,
                         AuctionTimeLeft = auctionTimeLeft,
                         StartingPrice = startingPrice,
-                        EstimatedPriceFailSafe = concatenatedText,
+
                     };
                     // Add the item to the list
                     auctionItems.Add(item);
@@ -161,7 +143,6 @@ namespace ArtsyBot
                     Console.WriteLine($"Description: {description}");
                     Console.WriteLine($"Page URL: {pageUrl}");
                     Console.WriteLine($"Estimate: {estimatedPrice}");
-                    Console.WriteLine($"FailSafeEstimate: {concatenatedText}");
                     Console.WriteLine($"Description Section: {spanText}");
                     Console.WriteLine($"AuctioneerName: {auctioneerName}");
                     Console.WriteLine($"Time left before Auction: {auctionTimeLeft}");
