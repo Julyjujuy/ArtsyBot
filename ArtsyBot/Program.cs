@@ -1,5 +1,7 @@
 ﻿
 
+using System.Diagnostics;
+
 namespace ArtsyBot
 {
     internal class Program
@@ -16,13 +18,13 @@ namespace ArtsyBot
             int failedExtractions = 0;
 
             // Loop from 1 to 100, constructing and scraping each page
-            for (int i = 1; i <= 100; i++)
+            for (int i = 1; i <= 2; i++)
             {
                 // Construct the new URL for this page
                 string restBaseUrl = $"{baseUrl}?page={i}";
 
                 // Scrape data from this page
-                bool success = LogicMethods.ScrapeWebsite(restBaseUrl, auctionItems,10);
+                bool success = LogicMethods.ScrapeWebsite(restBaseUrl, auctionItems,30);
 
                 if (success)
                 {
@@ -33,6 +35,7 @@ namespace ArtsyBot
                 {
                     failedExtractions++;
                     LogicMethods.Logger.Log($"Failed to scrape page {i}");
+                    Debugger.Break(); //TODO: Implement Handling
                 }
 
                 // Pause function with a random time between 1000 and 5000
@@ -61,7 +64,7 @@ namespace ArtsyBot
             LogicMethods.SaveReportToFile(report, reportFilePath);
 
             Console.WriteLine("Done scraping!");
-
+            Environment.Exit(0);
             Console.ReadLine();
         }
     }
