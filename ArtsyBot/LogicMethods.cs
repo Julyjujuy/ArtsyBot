@@ -110,7 +110,16 @@ namespace ArtsyBot
                         auctioneerNameNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//span[@data-testid='itemPageSellerName' and @class='sc-hLseeU AuctioneerInfo__SellerNameText-sc-1erc2m8-5 jnbWxy chuhQu']");
                         if (auctioneerNameNode == null)
                             Debugger.Break();
-
+                        Thread.Sleep(30 * 1000);
+                        innerHtmlDoc = web.Load(pageUrl);
+                        auctioneerNameNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//span[@data-testid='itemPageSellerName' and @class='sc-hLseeU AuctioneerInfo__SellerNameText-sc-1erc2m8-5 jnbWxy chuhQu']");
+                        if (auctioneerNameNode == null)
+                            Debugger.Break();
+                        Thread.Sleep(60 * 1000);
+                        innerHtmlDoc = web.Load(pageUrl);
+                        auctioneerNameNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//span[@data-testid='itemPageSellerName' and @class='sc-hLseeU AuctioneerInfo__SellerNameText-sc-1erc2m8-5 jnbWxy chuhQu']");
+                        if (auctioneerNameNode == null)
+                            Debugger.Break();
                     }
 
                     var auctioneerName = auctioneerNameNode?.InnerText;
