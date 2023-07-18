@@ -131,16 +131,28 @@ namespace ArtsyBot
                     //// Extract the starting price
                     var priceNode = htmlDoc.DocumentNode.SelectSingleNode("//h1[@data-testid='h1']/span[@class='FormattedCurrency__StyledFormattedCurrency-sc-1ugrxi1-0 kRoxAz']");
 
-                    if (priceNode == null)
+
+                    while (priceNode == null)
                     {
-                        
                         Thread.Sleep(60 * 1000);
                         innerHtmlDoc = web.Load(pageUrl);
                         priceNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//h1[@data-testid='h1']/span[@class='FormattedCurrency__StyledFormattedCurrency-sc-1ugrxi1-0 kRoxAz']");
+
                         if (priceNode == null)
                             Debugger.Break();
-
                     }
+
+
+                    //if (priceNode == null)
+                    //{
+
+                    //    Thread.Sleep(60 * 1000);
+                    //    innerHtmlDoc = web.Load(pageUrl);
+                    //    priceNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//h1[@data-testid='h1']/span[@class='FormattedCurrency__StyledFormattedCurrency-sc-1ugrxi1-0 kRoxAz']");
+                    //    if (priceNode == null)
+                    //        Debugger.Break();
+
+                    //}
 
 
 
