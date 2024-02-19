@@ -7,8 +7,10 @@ using System.Diagnostics;
 
 namespace ArtsyBot
 {
+
     public class LogicMethods
     {
+
         public static bool ScrapeWebsite(string url, List<AuctionItem> items, int delaySeconds)
         {
             const string filePath = @"C:\Temp\auction_items.xml";
@@ -26,121 +28,89 @@ namespace ArtsyBot
                 }
             };
 
-            if (lastStatusCode != HttpStatusCode.OK) 
+            if (lastStatusCode != HttpStatusCode.OK)
             {
-                ;
                 return false;
             }
 
             // Create a list to hold the scraped items
             List<AuctionItem> auctionItems = new List<AuctionItem>();
 
-            // Find all the article containers on the page
-            var articleContainers = htmlDoc.DocumentNode.SelectNodes("//article[contains(@class, 'CategorySearchCard__StyledCard-sc-1o7izf2-0')]");
-            if (articleContainers != null)
+            // Find all the section elements representing item containers
+            var itemContainers = htmlDoc.DocumentNode.SelectNodes("//section[@class='CategorySearchCard__CategorySearchCardGrid-sc-1o7izf2-2 gxjpRt']");
+
+            if (itemContainers != null)
             {
                 int counter = 0; // Initialize the counter variable
-                foreach (var container in articleContainers)
+
+                foreach (var container in itemContainers)
                 {
-
                     Thread.Sleep(delaySeconds * 1000);
-                    // Get the image URL from main Page
-                    var imageUrl = container.SelectSingleNode(".//img[1]")?.GetAttributeValue("src", "");
 
-                    // Get the general description
-                    var description = container.SelectSingleNode(".//img[1]")?.GetAttributeValue("alt", "");
+                    // Get the image URL
+                    var imageUrl = container.SelectSingleNode(".//section[@class='CardImage__StyledCardImage-sc-1fhtv7y-0']/a/div[@data-testid='itemCardImage']/img/@src")?.ToString();
 
+                    // Get the description
+                    Thread.Sleep(5000); 
+
+                    var description = container.SelectSingleNode(".//a[@class='sc-dPyGX fbA-dDA ItemCardTitle__ContainerLink-sc-1tlsgmv-0 cYqnCr']/span[@data-testid='body-primary' and @class='sc-hKFymg iDetkt']")?.InnerText;
                     // Get the page URL
-                    var pageUrlElement = container.SelectSingleNode(".//a");
+                    var pageUrlElement = container.SelectSingleNode(".//a[@class='sc-dPyGX fbA-dDA ImageRow__ContainerLink-sc-1s4yel2-0 bkYgH CardImage__ItemCardImageGrid-sc-1fhtv7y-1 dNYGTn']");
                     var pageUrl = pageUrlElement?.GetAttributeValue("href", "");
 
                     // Concatenate the prefix to the page URL
                     pageUrl = "https://www.liveauctioneers.com" + pageUrl;
 
-                    // Navigate to the page URL and load the inner HTML document
-                    HtmlDocument innerHtmlDoc = web.Load(pageUrl);
+                    // Get the estimated price
+                    var estimatedPriceNode = container.SelectSingleNode(".//section[@class='CardPrice__CardPriceSection-sc-4ass5j-0 bORVSy']/section[@class='CardPrice__StyledBidInfoSection-sc-4ass5j-1 dmTeDo']/section[@class='CardPrice__StyledBidInfo-sc-4ass5j-2 imWqDt']/section/span/a/span[@class='FormattedCurrency__StyledFormattedCurrency-sc-1ugrxi1-0 cZCaob']");
+                    var estimatedPrice = estimatedPriceNode?.InnerText;
 
-                    //check if load suceesful
-                    if (innerHtmlDoc == null)
-                    {
-                        //load failed / limit hit
-                        Thread.Sleep(60 * 1000);
-                        innerHtmlDoc = web.Load(pageUrl);
-                        if (innerHtmlDoc == null)
-                            Debugger.Break();
-
-                    }
-
-                    // Extract the Estimate text again in case it is encased
-                    var estimateNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//div[@class='ItemBiddingEstimate__StyledEstimateAmounts-sc-e0x4f0-4 eRGEFe']");
-
-                    //check if load suceesful
-                    if(estimateNode == null)
-                    {
-                        //load failed / limit hit
-                        Thread.Sleep(60 * 1000);
-                        innerHtmlDoc = web.Load(pageUrl);
-                        estimateNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//div[@class='ItemBiddingEstimate__StyledEstimateAmounts-sc-e0x4f0-4 eRGEFe']");
-                        if (estimateNode == null)
-                            Debugger.Break();//2 tries still boo TODO: implement handling
-
-                    }
-
-                    var estimatedPrice = estimateNode?.InnerText;
-
-                    //sometimes unhappy with estimatedPrice
-                    if(estimatedPrice == null || estimatedPrice.Contains("something"))
-                    {
-                        ;
-                    }
-
-                    // Extract the description section
-                    var spanElement = innerHtmlDoc.DocumentNode.SelectSingleNode("//span[@data-testid='body-primary' and contains(@class, 'sc-vjKnw kanvka DescriptionSection__StyledBody-sc-trkwix-2 gtFpYt')]");
-                    string spanText = spanElement?.InnerText ?? string.Empty;
-
-                    // Extract the name from AuctioneerInfo
-                    var auctioneerNameNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//span[@data-testid='itemPageSellerName' and @class='sc-hLseeU AuctioneerInfo__SellerNameText-sc-1erc2m8-5 jnbWxy chuhQu']");
-
-
-                    if (auctioneerNameNode == null)
-                    {
-                        
-                        Thread.Sleep(60 * 1000);
-                        innerHtmlDoc = web.Load(pageUrl);
-                        auctioneerNameNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//span[@data-testid='itemPageSellerName' and @class='sc-hLseeU AuctioneerInfo__SellerNameText-sc-1erc2m8-5 jnbWxy chuhQu']");
-                        if (auctioneerNameNode == null)
-                            Debugger.Break();
-                        Thread.Sleep(30 * 1000);
-                        innerHtmlDoc = web.Load(pageUrl);
-                        auctioneerNameNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//span[@data-testid='itemPageSellerName' and @class='sc-hLseeU AuctioneerInfo__SellerNameText-sc-1erc2m8-5 jnbWxy chuhQu']");
-                        if (auctioneerNameNode == null)
-                            Debugger.Break();
-                        Thread.Sleep(60 * 1000);
-                        innerHtmlDoc = web.Load(pageUrl);
-                        auctioneerNameNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//span[@data-testid='itemPageSellerName' and @class='sc-hLseeU AuctioneerInfo__SellerNameText-sc-1erc2m8-5 jnbWxy chuhQu']");
-                        if (auctioneerNameNode == null)
-                            Debugger.Break();
-                    }
-
+                    // Get the auctioneer name
+                    var auctioneerNameNode = container.SelectSingleNode(".//section[@class='CardInfo__CardInfoSection-sc-1bvw270-0 jHQfzK']/a[@class='sc-kEqXeH fgHGD CardInfo__StyledAuctionHouseName-sc-1bvw270-2 kGlvMC']/span[@data-testid='body-secondary' and @class='sc-hKFymg AOFIB']");
                     var auctioneerName = auctioneerNameNode?.InnerText;
 
+                    // Get the auction time left
+                    var auctionTimeLeftNode = container.SelectSingleNode(".//section[@class='CardInfo__CardInfoSection-sc-1bvw270-0 jHQfzK']/span[@class='CardInfo__StyledDateInfo-sc-1bvw270-1 iMecBV']/span[@data-testid='body-secondary' and @class='sc-hKFymg hQgMeF']/span[@data-testid='date-span' and @class='sc-hKFymg hQgMeF']/span[@data-testid='body-secondary' and @class='sc-h']");
+
+                    //if (auctioneerNameNode == null)
+                    //{
+                        
+                    //    Thread.Sleep(60 * 1000);
+                    //    innerHtmlDoc = web.Load(pageUrl);
+                    //    auctioneerNameNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//span[@data-testid='itemPageSellerName' and @class='sc-hLseeU AuctioneerInfo__SellerNameText-sc-1erc2m8-5 jnbWxy chuhQu']");
+                    //    if (auctioneerNameNode == null)
+                    //        Debugger.Break();
+                    //    Thread.Sleep(30 * 1000);
+                    //    innerHtmlDoc = web.Load(pageUrl);
+                    //    auctioneerNameNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//span[@data-testid='itemPageSellerName' and @class='sc-hLseeU AuctioneerInfo__SellerNameText-sc-1erc2m8-5 jnbWxy chuhQu']");
+                    //    if (auctioneerNameNode == null)
+                    //        Debugger.Break();
+                    //    Thread.Sleep(60 * 1000);
+                    //    innerHtmlDoc = web.Load(pageUrl);
+                    //    auctioneerNameNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//span[@data-testid='itemPageSellerName' and @class='sc-hLseeU AuctioneerInfo__SellerNameText-sc-1erc2m8-5 jnbWxy chuhQu']");
+                    //    if (auctioneerNameNode == null)
+                    //        Debugger.Break();
+                    //}
+
+              //      var auctioneerName = auctioneerNameNode?.InnerText;
+
                     // Extract the time left before the Auction
-                    var dateNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//div[contains(@class, 'lt1g861EjAKl0fG1gZvV') and contains(@class, 'BiddingCountdown__StyledCountdown-sc-et36hu-0')]");
-                    var auctionTimeLeft = dateNode?.InnerText;
+                    //var dateNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//div[contains(@class, 'lt1g861EjAKl0fG1gZvV') and contains(@class, 'BiddingCountdown__StyledCountdown-sc-et36hu-0')]");
+                    //var auctionTimeLeft = dateNode?.InnerText;
 
                     //// Extract the starting price
                     var priceNode = htmlDoc.DocumentNode.SelectSingleNode("//h1[@data-testid='h1']/span[@class='FormattedCurrency__StyledFormattedCurrency-sc-1ugrxi1-0 kRoxAz']");
 
 
-                    while (priceNode == null)
-                    {
-                        Thread.Sleep(60 * 1000);
-                        innerHtmlDoc = web.Load(pageUrl);
-                        priceNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//h1[@data-testid='h1']/span[@class='FormattedCurrency__StyledFormattedCurrency-sc-1ugrxi1-0 kRoxAz']");
+                    //while (priceNode == null)
+                    //{
+                    //    Thread.Sleep(60 * 1000);
+                    //    innerHtmlDoc = web.Load(pageUrl);
+                    //    priceNode = innerHtmlDoc.DocumentNode.SelectSingleNode("//h1[@data-testid='h1']/span[@class='FormattedCurrency__StyledFormattedCurrency-sc-1ugrxi1-0 kRoxAz']");
 
-                        if (priceNode == null)
-                            Debugger.Break();
-                    }
+                    //    if (priceNode == null)
+                    //        Debugger.Break();
+                    //}
 
 
                     //if (priceNode == null)
@@ -169,9 +139,9 @@ namespace ArtsyBot
                         Description = description,
                         PageUrl = pageUrl,
                         EstimatedPrice = estimatedPrice,
-                        LongDescription = spanText,
+             //           LongDescription = spanText,
                         AuctioneerName = auctioneerName,
-                        AuctionTimeLeft = auctionTimeLeft,
+                 //       AuctionTimeLeft = auctionTimeLeft,
                         StartingPrice = startingPrice,
 
                     };
@@ -183,9 +153,9 @@ namespace ArtsyBot
                     Console.WriteLine($"Description: {description}");
                     Console.WriteLine($"Page URL: {pageUrl}");
                     Console.WriteLine($"Estimate: {estimatedPrice}");
-                    Console.WriteLine($"Description Section: {spanText}");
+                    //Console.WriteLine($"Description Section: {spanText}");
                     Console.WriteLine($"AuctioneerName: {auctioneerName}");
-                    Console.WriteLine($"Time left before Auction: {auctionTimeLeft}");
+           //         Console.WriteLine($"Time left before Auction: {auctionTimeLeft}");
                     Console.WriteLine($"Starting Price: {startingPrice}");
                     Console.WriteLine();
                 }

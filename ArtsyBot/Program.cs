@@ -18,7 +18,7 @@ namespace ArtsyBot
             int failedExtractions = 0;
 
             // Loop from 1 to 100, constructing and scraping each page
-            for (int i = 1; i <= 2; i++)
+            for (int i = 1; i <= 10; i++)
             {
                 // Construct the new URL for this page
                 string restBaseUrl = $"{baseUrl}?page={i}";
