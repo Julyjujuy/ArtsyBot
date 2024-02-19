@@ -35,7 +35,7 @@ namespace ArtsyBot
                 {
                     failedExtractions++;
                     LogicMethods.Logger.Log($"Failed to scrape page {i}");
-                    Debugger.Break(); //TODO: Implement Handling
+                    Debugger.Break(); 
                 }
 
                 // Pause function with a random time between 1000 and 5000
