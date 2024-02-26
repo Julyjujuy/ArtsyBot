@@ -65,13 +65,12 @@ namespace ArtsyBot
                     // Concatenate the prefix to the page URL
                     pageUrl = "https://www.liveauctioneers.com" + pageUrl;
 
-                    // Get the estimated price
+                    // Get the estimated price (working)
                     var estimatedPriceNode = container.SelectSingleNode(".//span [@class=\"FormattedCurrency__StyledFormattedCurrency-sc-1ugrxi1-0 cZCaob\"]"); 
                     var estimatedPrice = estimatedPriceNode?.InnerText;
 
                
-
-                    // Get the auctioneer name                            
+                    // Get the auctioneer name (working)                           
                     var auctioneerNameNode = container.SelectSingleNode(".//section[@class='CardInfo__CardInfoSection-sc-1bvw270-0 jHQfzK']/a[@class='sc-kEqXeH fgHGD CardInfo__StyledAuctionHouseName-sc-1bvw270-2 kGlvMC']/span[@data-testid='body-secondary' and @class='sc-hKFymg AOFIB']");
                     var auctioneerName = auctioneerNameNode?.InnerText;
 
@@ -79,11 +78,9 @@ namespace ArtsyBot
                     var auctionTimeLeftNode = container.SelectSingleNode("//span[@data-testid=\"body-secondary\" and @class=\"sc-hKFymg hQgMeF\"]//span[@data-testid=\"date-span\" and @class=\"sc-hKFymg hQgMeF\"]//span[@data-testid=\"body-secondary\" and @class=\"sc-hKFymg fmGzJe CatalogDate__CountdownSpan-sc-132deab-0 bxNvnk\"]");
                     var auctionTimeLeft = auctionTimeLeftNode?.InnerText;
 
-                   
                     //// Extract the starting price
                     var priceNode = htmlDoc.DocumentNode.SelectSingleNode("//h1[@data-testid='h1']/span[@class='FormattedCurrency__StyledFormattedCurrency-sc-1ugrxi1-0 kRoxAz']");
                     string startingPrice = priceNode?.InnerText ?? string.Empty;
-
 
                     // Increment the counter
                     counter++;
