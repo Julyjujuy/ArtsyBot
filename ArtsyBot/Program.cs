@@ -24,7 +24,7 @@ namespace ArtsyBot
                 string restBaseUrl = $"{baseUrl}?page={i}";
 
                 // Scrape data from this page
-                bool success = LogicMethods.ScrapeWebsite(restBaseUrl, auctionItems,30);
+                bool success = LogicMethods.ScrapeWebsite(restBaseUrl, auctionItems,10);
 
                 if (success)
                 {
